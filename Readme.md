@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Sash Ka](https://up.htmlacademy.ru/javascript/20/user/4989).
-* Наставник: `Неизвестно`.
+* Наставник: Евгений Суглобов.
 
 ---
 
