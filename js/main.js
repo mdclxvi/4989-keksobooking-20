@@ -3,15 +3,33 @@
 var map = document.querySelector('.map');
 map.classList.remove('map--faded');
 
+var avatars = [
+  'img/avatars/user01.png',
+  'img/avatars/user02.png',
+  'img/avatars/user03.png',
+  'img/avatars/user04.png',
+  'img/avatars/user05.png',
+  'img/avatars/user06.png',
+  'img/avatars/user07.png',
+  'img/avatars/user08.png',
+];
+
+var types = [
+  'palace',
+  'flat',
+  'house',
+  'bungalo',
+]
+
 var createObjectAdvert = function () {
   var advert = {
     author: {
-      avatar: '1'
+      avatar: 'img/avatars/user{{xx}}.png'
     },
     offer: {
-      title: '2',
-      address: '3',
-      price: '4',
+      title: 'Заголовок предложения',
+      address: '600, 350',
+      price: '20',
       type: '5',
       rooms: '6',
       guests: '7',
@@ -38,18 +56,17 @@ var createArrayAdverts = function (length) {
   return adverts;
 };
 
-var getRandomValue = function (inputValue) {
+var getRandomValue = function (max, min) {
+  return Math.floor(Math.random() * (max - min)) + min;
+};
 
-  for (var i = 0; i < inputValue.length; i++) {
-    var length = inputValue.length;
-    var randomValue = inputValue[Math.floor(Math.random() * (length - 0)) + 0];
-  }
-
-  return randomValue;
+var getRandomElement = function (arr) {
+  var randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
 };
 
 var haha = createObjectAdvert();
 
-var ooops = createArrayAdverts(8, haha);
+var ooops = getRandomValue(630, 130);
 console.log(ooops);
 
