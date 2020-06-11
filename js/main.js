@@ -58,18 +58,7 @@ var photos = [
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg',
 ];
 
-
-var advertCard = {
-  avatars: avatars,
-  types: types,
-  checkins: checkins,
-  checkouts: checkouts,
-  features: features,
-  photos: photos,
-};
-
-
-var getRandomValue = function (max, min) {
+var getRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 };
 
@@ -78,56 +67,68 @@ var getRandomElement = function (arr) {
   return arr[randomIndex];
 };
 
-var createArrayAdverts = function (countAdvert, widthContainer) {
+var getRandomLenghtArray = function (arr) {
+  var count = getRandomNumber(1, arr.length);
+  var arrResult = arr.slice(0, count);
+  return arrResult;
+};
 
-  var adverts = [];
-  for (var i = 0; i < countAdvert; i++) {
-    var advert = {
+var createArrayItems = function (count, widthContainer) {
+
+  var items = [];
+  for (var i = 0; i < count; i++) {
+
+    var x = getRandomNumber(0, widthContainer);
+    var y = getRandomNumber(130, 360);
+    var result = x + ', ' + y;
+
+    var item = {
       author: {
         avatar: avatars[i]
       },
       offer: {
         title: 'Заголовок предложения',
-        address: '600, 350',
+        address: result,
         price: '20',
         type: getRandomElement(types),
         rooms: 3,
         guests: 7,
         checkin: getRandomElement(checkins),
         checkout: getRandomElement(checkouts),
-        features: getRandomElement(features),
+        features: getRandomLenghtArray(features),
         description: '11',
-        photos: getRandomElement(photos)
+        photos: getRandomLenghtArray(photos),
       },
       location: {
-        x: getRandomValue(widthContainer, 0),
-        y: getRandomValue(360, 130),
+        x: x,
+        y: y,
       }
     };
-    adverts.push(advert);
+    items.push(item);
   }
 
-  return adverts;
+  return items;
 };
 
-var renderPin = function (template, width, height, advert) {
+var getCollectPin = function (template, width, height, item) {
 
   var pinElement = template.cloneNode(true);
-  pinElement.style.left = advert.location.x - width / 2 + 'px';
-  pinElement.style.top = advert.location.y - height + 'px';
-  pinElement.querySelector('img').setAttribute('alt', advert.offer.title);
-  pinElement.querySelector('img').src = advert.author.avatar;
+  var imgPin = pinElement.querySelector('img');
+
+  pinElement.style.left = item.location.x - width / 2 + 'px';
+  pinElement.style.top = item.location.y - height + 'px';
+  imgPin.setAttribute('alt', item.offer.title);
+  imgPin.src = item.author.avatar;
 
   return pinElement;
 };
 
-var adverts = createArrayAdverts(8, widthPinContainer, advertCard);
-
+var pinItems = createArrayItems(8, widthPinContainer);
 var fragment = document.createDocumentFragment();
 
-for (var i = 0; i < adverts.length; i++) {
-  fragment.appendChild(renderPin(advertTemplate, PIN_WIDTH, PIN_HEIGHT, adverts[i]));
+for (var i = 0; i < pinItems.length; i++) {
+  var pinItem = getCollectPin(advertTemplate, PIN_WIDTH, PIN_HEIGHT, pinItems[i]);
+  fragment.appendChild(pinItem);
 }
 
 pinContainer.appendChild(fragment);
-
