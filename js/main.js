@@ -73,7 +73,7 @@ var getRandomElement = function (arr) {
 };
 
 var getRandomLenghtArray = function (arr) {
-  var count = getRandomNumber(1, arr.length);
+  var count = getRandomNumber(0, arr.length);
   var arrResult = arr.slice(0, count);
   return arrResult;
 };
@@ -147,6 +147,7 @@ var getCollectOffer = function (template, item) {
   var type = offerElement.querySelector('.popup__type');
   var capacity = offerElement.querySelector('.popup__text--capacity');
   var time = offerElement.querySelector('.popup__text--time');
+  var offerFeaturesContainer = offerElement.querySelector('.popup__features');
   var offerFeatures = offerElement.querySelectorAll('.popup__feature');
   var description = offerElement.querySelector('.popup__description');
   var offerPhotosContainer = offerElement.querySelector('.popup__photos');
@@ -165,22 +166,29 @@ var getCollectOffer = function (template, item) {
   var photosArr = item.offer.photos;
   var featuresArr = item.offer.features;
 
-  for (var j = 0; j < photosArr.length; j++) {
-    if (photosArr.length > 1) {
-      var newEl = offerPhoto.cloneNode(true);
-      newEl.src = photosArr[j];
-      offerPhotosContainer.appendChild(newEl);
-    } else {
-      offerPhoto.src = photosArr[j];
+  if (photosArr.length > 0) {
+    for (var j = 0; j < photosArr.length; j++) {
+      if (photosArr.length > 1) {
+        var newEl = offerPhoto.cloneNode(true);
+        newEl.src = photosArr[j];
+        offerPhotosContainer.appendChild(newEl);
+      } else {
+        offerPhoto.src = photosArr[j];
+      }
     }
+  } else {
+    offerPhotosContainer.style.display = 'none';
   }
 
-  for (var k = 0; k < featuresArr.length; k++) {
-    offerFeatures[k].textContent = featuresArr[k];
-    if (offerFeatures[k].textContent.length === 0) {
-      offerFeatures[k].style.display = 'none';
+
+  if (featuresArr.length > 0) {
+    for (var k = 0; k < featuresArr.length; k++) {
+      offerFeatures[k].textContent = featuresArr[k];
     }
+  } else {
+    offerFeaturesContainer.style.display = 'none';
   }
+
 
   return offerElement;
 };
@@ -191,5 +199,3 @@ for (var j = 0; j < 1; j++) {
 }
 
 map.insertBefore(fragment, mapFiltersContainer);
-
-
