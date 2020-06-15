@@ -177,7 +177,7 @@ var getCollectOffer = function (template, item) {
 
   for (var k = 0; k < featuresArr.length; k++) {
     offerFeatures[k].textContent = featuresArr[k];
-    if(offerFeatures[k].textContent.length === 0) {
+    if (offerFeatures[k].textContent.length === 0) {
       offerFeatures[k].style.display = 'none';
     }
   }
@@ -192,6 +192,4 @@ for (var j = 0; j < 1; j++) {
 
 map.insertBefore(fragment, mapFiltersContainer);
 
-var ooops = getRandomLenghtArray(photos);
-console.log(ooops);
 
