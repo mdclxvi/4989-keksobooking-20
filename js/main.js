@@ -163,17 +163,23 @@ var getCollectOffer = function (template, item) {
   description.textContent = item.offer.description;
   avatar.src = item.author.avatar;
 
-  var photosArr = item.offer.photos;
-  var featuresArr = item.offer.features;
+  var featuresList = {
+    wifi: 'popup__feature--wifi',
+    dishwasher: 'popup__feature--dishwasher',
+    parking: 'popup__feature--parking',
+    washer: 'popup__feature--washer',
+    elevator: 'popup__feature--elevator',
+    conditioner: 'popup__feature--conditioner',
+  };
 
-  if (photosArr.length > 0) {
-    for (var j = 0; j < photosArr.length; j++) {
-      if (photosArr.length > 1) {
+  if (item.offer.photos.length > 0) {
+    for (var j = 0; j < item.offer.photos.length; j++) {
+      if (item.offer.photos.length > 1) {
         var newEl = offerPhoto.cloneNode(true);
-        newEl.src = photosArr[j];
+        newEl.src = item.offer.photos[j];
         offerPhotosContainer.appendChild(newEl);
       } else {
-        offerPhoto.src = photosArr[j];
+        offerPhoto.src = item.offer.photos[j];
       }
     }
   } else {
@@ -181,14 +187,20 @@ var getCollectOffer = function (template, item) {
   }
 
 
-  if (featuresArr.length > 0) {
-    for (var k = 0; k < featuresArr.length; k++) {
-      offerFeatures[k].textContent = featuresArr[k];
+  if (item.offer.features.length > 0) {
+    for (var k = 0; k < item.offer.features.length; k++) {
+      var temp = featuresList[item.offer.features[k]];
+      if (offerFeatures[k].classList.contains(temp)) {
+        console.log('совпало!');
+      } else {
+        offerFeatures[k].remove();
+      }
     }
   } else {
     offerFeaturesContainer.style.display = 'none';
   }
-
+  console.log(offerFeatures);
+  console.log(item.offer.features);
 
   return offerElement;
 };
@@ -199,3 +211,6 @@ for (var j = 0; j < 1; j++) {
 }
 
 map.insertBefore(fragment, mapFiltersContainer);
+
+var ooops = getCollectOffer(cardTemplate, pinItems[0]);
+
