@@ -173,34 +173,26 @@ var getCollectOffer = function (template, item) {
   };
 
   if (item.offer.photos.length > 0) {
-    for (var j = 0; j < item.offer.photos.length; j++) {
-      if (item.offer.photos.length > 1) {
-        var newEl = offerPhoto.cloneNode(true);
-        newEl.src = item.offer.photos[j];
-        offerPhotosContainer.appendChild(newEl);
-      } else {
-        offerPhoto.src = item.offer.photos[j];
-      }
+    offerPhoto.src = item.offer.photos[0];
+    for (var j = 1; j < item.offer.photos.length; j++) {
+      var newOfferPhoto = offerPhoto.cloneNode(true);
+      newOfferPhoto.src = item.offer.photos[j];
+      offerPhotosContainer.appendChild(newOfferPhoto);
     }
   } else {
-    offerPhotosContainer.style.display = 'none';
+    offerPhotosContainer.remove();
   }
 
-
   if (item.offer.features.length > 0) {
-    for (var k = 0; k < item.offer.features.length; k++) {
-      var temp = featuresList[item.offer.features[k]];
-      if (offerFeatures[k].classList.contains(temp)) {
-        console.log('совпало!');
-      } else {
+    for (var k = 0; k < offerFeatures.length; k++) {
+      var featureClass = featuresList[item.offer.features[k]];
+      if (!offerFeatures[k].classList.contains(featureClass)) {
         offerFeatures[k].remove();
       }
     }
   } else {
-    offerFeaturesContainer.style.display = 'none';
+    offerFeaturesContainer.remove();
   }
-  console.log(offerFeatures);
-  console.log(item.offer.features);
 
   return offerElement;
 };
@@ -211,6 +203,3 @@ for (var j = 0; j < 1; j++) {
 }
 
 map.insertBefore(fragment, mapFiltersContainer);
-
-var ooops = getCollectOffer(cardTemplate, pinItems[0]);
-
