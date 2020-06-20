@@ -185,8 +185,11 @@ var getCollectOffer = function (template, item) {
 
   if (item.offer.features.length > 0) {
     for (var k = 0; k < offerFeatures.length; k++) {
-      var featureClass = featuresList[item.offer.features[k]];
-      if (!offerFeatures[k].classList.contains(featureClass)) {
+      if (item.offer.features.some(function (elem) {
+        elem = featuresList[item.offer.features[k]];
+        return elem;
+      })) {
+      } else {
         offerFeatures[k].remove();
       }
     }
