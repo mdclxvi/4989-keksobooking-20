@@ -141,27 +141,30 @@ pinContainer.appendChild(fragment);
 var getCollectOffer = function (template, item) {
 
   var offerElement = template.cloneNode(true);
-  var title = offerElement.querySelector('.popup__title');
-  var address = offerElement.querySelector('.popup__text--address');
-  var price = offerElement.querySelector('.popup__text--price');
-  var type = offerElement.querySelector('.popup__type');
-  var capacity = offerElement.querySelector('.popup__text--capacity');
-  var time = offerElement.querySelector('.popup__text--time');
-  var offerFeaturesContainer = offerElement.querySelector('.popup__features');
-  var offerFeatures = offerElement.querySelectorAll('.popup__feature');
-  var description = offerElement.querySelector('.popup__description');
-  var offerPhotosContainer = offerElement.querySelector('.popup__photos');
-  var offerPhoto = offerElement.querySelector('.popup__photo');
-  var avatar = offerElement.querySelector('.popup__avatar');
 
-  title.textContent = item.offer.title;
-  address.textContent = item.offer.address;
-  price.textContent = item.offer.price;
-  type.textContent = item.offer.type;
-  capacity.textContent = item.offer.rooms + ' комнаты для ' + item.offer.guests + ' гостей';
-  time.textContent = 'Заезд после ' + item.offer.checkin + ', выезд до ' + item.offer.checkout;
-  description.textContent = item.offer.description;
-  avatar.src = item.author.avatar;
+  var dom = {
+    title: offerElement.querySelector('.popup__title'),
+    address: offerElement.querySelector('.popup__text--address'),
+    price: offerElement.querySelector('.popup__text--price'),
+    type: offerElement.querySelector('.popup__type'),
+    capacity: offerElement.querySelector('.popup__text--capacity'),
+    time: offerElement.querySelector('.popup__text--time'),
+    offerFeaturesContainer: offerElement.querySelector('.popup__features'),
+    offerFeatures: offerElement.querySelectorAll('.popup__feature'),
+    description: offerElement.querySelector('.popup__description'),
+    offerPhotosContainer: offerElement.querySelector('.popup__photos'),
+    offerPhoto: offerElement.querySelector('.popup__photo'),
+    avatar: offerElement.querySelector('.popup__avatar'),
+  };
+
+  dom.title.textContent = item.offer.title;
+  dom.address.textContent = item.offer.address;
+  dom.price.textContent = item.offer.price;
+  dom.type.textContent = item.offer.type;
+  dom.capacity.textContent = item.offer.rooms + ' комнаты для ' + item.offer.guests + ' гостей';
+  dom.time.textContent = 'Заезд после ' + item.offer.checkin + ', выезд до ' + item.offer.checkout;
+  dom.description.textContent = item.offer.description;
+  dom.avatar.src = item.author.avatar;
 
   var featuresList = {
     wifi: 'popup__feature--wifi',
@@ -173,27 +176,27 @@ var getCollectOffer = function (template, item) {
   };
 
   if (item.offer.photos.length > 0) {
-    offerPhoto.src = item.offer.photos[0];
+    dom.offerPhoto.src = item.offer.photos[0];
     for (var j = 1; j < item.offer.photos.length; j++) {
-      var newOfferPhoto = offerPhoto.cloneNode(true);
+      var newOfferPhoto = dom.offerPhoto.cloneNode(true);
       newOfferPhoto.src = item.offer.photos[j];
-      offerPhotosContainer.appendChild(newOfferPhoto);
+      dom.offerPhotosContainer.appendChild(newOfferPhoto);
     }
   } else {
-    offerPhotosContainer.remove();
+    dom.offerPhotosContainer.remove();
   }
 
   if (item.offer.features.length > 0) {
-    for (var k = 0; k < offerFeatures.length; k++) {
+    for (var k = 0; k < dom.offerFeatures.length; k++) {
       if (!item.offer.features.some(function (elem) {
         var elemClass = featuresList[elem];
-        return offerFeatures[k].classList.contains(elemClass);
+        return dom.offerFeatures[k].classList.contains(elemClass);
       })) {
-        offerFeatures[k].remove();
+        dom.offerFeatures[k].remove();
       }
     }
   } else {
-    offerFeaturesContainer.remove();
+    dom.offerFeaturesContainer.remove();
   }
 
   return offerElement;
