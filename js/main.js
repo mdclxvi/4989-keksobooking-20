@@ -5,6 +5,7 @@ var PIN_HEIGHT = 70;
 
 var map = document.querySelector('.map');
 map.classList.remove('map--faded');
+var mapFiltersContainer = map.querySelector('.map__filters-container');
 
 var pinContainer = document.querySelector('.map__pins');
 var widthPinContainer = pinContainer.offsetWidth;
@@ -12,6 +13,10 @@ var widthPinContainer = pinContainer.offsetWidth;
 var advertTemplate = document.querySelector('#pin')
     .content
     .querySelector('.map__pin');
+
+var cardTemplate = document.querySelector('#card')
+    .content
+    .querySelector('.map__card');
 
 var avatars = [
   'img/avatars/user01.png',
@@ -68,7 +73,7 @@ var getRandomElement = function (arr) {
 };
 
 var getRandomLenghtArray = function (arr) {
-  var count = getRandomNumber(1, arr.length);
+  var count = getRandomNumber(0, arr.length);
   var arrResult = arr.slice(0, count);
   return arrResult;
 };
@@ -80,7 +85,7 @@ var createArrayItems = function (count, widthContainer) {
 
     var x = getRandomNumber(0, widthContainer);
     var y = getRandomNumber(130, 360);
-    var result = x + ', ' + y;
+    var address = x + ', ' + y;
 
     var item = {
       author: {
@@ -88,7 +93,7 @@ var createArrayItems = function (count, widthContainer) {
       },
       offer: {
         title: 'Заголовок предложения',
-        address: result,
+        address: address,
         price: '20',
         type: getRandomElement(types),
         rooms: 3,
@@ -96,7 +101,7 @@ var createArrayItems = function (count, widthContainer) {
         checkin: getRandomElement(checkins),
         checkout: getRandomElement(checkouts),
         features: getRandomLenghtArray(features),
-        description: '11',
+        description: 'описание объекта',
         photos: getRandomLenghtArray(photos),
       },
       location: {
@@ -132,3 +137,74 @@ for (var i = 0; i < pinItems.length; i++) {
 }
 
 pinContainer.appendChild(fragment);
+
+var getCollectOffer = function (template, item) {
+
+  var offerElement = template.cloneNode(true);
+
+  var dom = {
+    title: offerElement.querySelector('.popup__title'),
+    address: offerElement.querySelector('.popup__text--address'),
+    price: offerElement.querySelector('.popup__text--price'),
+    type: offerElement.querySelector('.popup__type'),
+    capacity: offerElement.querySelector('.popup__text--capacity'),
+    time: offerElement.querySelector('.popup__text--time'),
+    offerFeaturesContainer: offerElement.querySelector('.popup__features'),
+    offerFeatures: offerElement.querySelectorAll('.popup__feature'),
+    description: offerElement.querySelector('.popup__description'),
+    offerPhotosContainer: offerElement.querySelector('.popup__photos'),
+    offerPhoto: offerElement.querySelector('.popup__photo'),
+    avatar: offerElement.querySelector('.popup__avatar'),
+  };
+
+  dom.title.textContent = item.offer.title;
+  dom.address.textContent = item.offer.address;
+  dom.price.textContent = item.offer.price;
+  dom.type.textContent = item.offer.type;
+  dom.capacity.textContent = item.offer.rooms + ' комнаты для ' + item.offer.guests + ' гостей';
+  dom.time.textContent = 'Заезд после ' + item.offer.checkin + ', выезд до ' + item.offer.checkout;
+  dom.description.textContent = item.offer.description;
+  dom.avatar.src = item.author.avatar;
+
+  var featuresList = {
+    wifi: 'popup__feature--wifi',
+    dishwasher: 'popup__feature--dishwasher',
+    parking: 'popup__feature--parking',
+    washer: 'popup__feature--washer',
+    elevator: 'popup__feature--elevator',
+    conditioner: 'popup__feature--conditioner',
+  };
+
+  if (item.offer.photos.length > 0) {
+    dom.offerPhoto.src = item.offer.photos[0];
+    for (var j = 1; j < item.offer.photos.length; j++) {
+      var newOfferPhoto = dom.offerPhoto.cloneNode(true);
+      newOfferPhoto.src = item.offer.photos[j];
+      dom.offerPhotosContainer.appendChild(newOfferPhoto);
+    }
+  } else {
+    dom.offerPhotosContainer.remove();
+  }
+
+  if (item.offer.features.length > 0) {
+    for (var k = 0; k < dom.offerFeatures.length; k++) {
+      if (!item.offer.features.some(function (elem) {
+        var elemClass = featuresList[elem];
+        return dom.offerFeatures[k].classList.contains(elemClass);
+      })) {
+        dom.offerFeatures[k].remove();
+      }
+    }
+  } else {
+    dom.offerFeaturesContainer.remove();
+  }
+
+  return offerElement;
+};
+
+for (var j = 0; j < 1; j++) {
+  var offerItem = getCollectOffer(cardTemplate, pinItems[0]);
+  fragment.appendChild(offerItem);
+}
+
+map.insertBefore(fragment, mapFiltersContainer);
