@@ -185,11 +185,10 @@ var getCollectOffer = function (template, item) {
 
   if (item.offer.features.length > 0) {
     for (var k = 0; k < offerFeatures.length; k++) {
-      if (item.offer.features.some(function (elem) {
-        elem = featuresList[item.offer.features[k]];
-        return elem;
+      if (!item.offer.features.some(function (elem) {
+        var elemClass = featuresList[elem];
+        return offerFeatures[k].classList.contains(elemClass);
       })) {
-      } else {
         offerFeatures[k].remove();
       }
     }
