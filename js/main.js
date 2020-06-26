@@ -8,7 +8,6 @@ var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
 
 var map = document.querySelector('.map');
-// map.classList.remove('map--faded');
 var pinMain = map.querySelector('.map__pin--main');
 var mapFiltersContainer = map.querySelector('.map__filters-container');
 
@@ -106,17 +105,17 @@ var getPinMainPosition = function (el, width, height, arrowheight) {
   if (arrowheight) {
     var offsetTop = Math.round(top - (height + arrowheight) / 2);
   } else {
-    var offsetTop = Math.round(top - height / 2);
+    offsetTop = Math.round(top - height / 2);
   }
 
-  var locationPin = {
+  var pinPosition = {
     offsetLeft: offsetLeft,
     offsetTop: offsetTop,
     toString: function () {
       return this.offsetLeft + ', ' + this.offsetTop;
     }
   };
-  return locationPin;
+  return pinPosition;
 };
 
 pinMain.addEventListener('mousedown', function (evt) {
@@ -134,26 +133,34 @@ pinMain.addEventListener('keydown', function (evt) {
 });
 
 adForm.addEventListener('change', function () {
-  var num = roomNumberSelect.value;
-  getRoomsForGuests(num);
+  getRoomsForGuests(roomNumberSelect, capacitySelect);
 });
 
-var getRoomsForGuests = function (num) {
+var getRoomsForGuests = function (rooms, capacity) {
+  var num = rooms.value;
+  var cap = capacity.value;
+
   if (num === '1' || num === '100') {
-    capacitySelect.setAttribute('disabled', 'disabled');
     if (num === '1') {
-      capacitySelect.selectedIndex = 0;
+      capacity.selectedIndex = 0;
     } else if (num === '100') {
-      capacitySelect.selectedIndex = 3;
+      capacity.selectedIndex = 3;
     }
+    capacity.setAttribute('disabled', 'disabled');
   } else {
-    capacitySelect.removeAttribute('disabled');
+    capacity.removeAttribute('disabled');
     if (num === '2') {
-      capacitySelect.options[2].setAttribute('disabled', 'disabled');
-      capacitySelect.options[3].setAttribute('disabled', 'disabled');
+      capacity.options[2].setAttribute('disabled', 'disabled');
+      capacity.options[3].setAttribute('disabled', 'disabled');
+      if (cap === '0') {
+        capacity.setCustomValidity('Выберите количество мест');
+      }
     } else if (num === '3') {
-      capacitySelect.options[2].removeAttribute('disabled', 'disabled');
-      capacitySelect.options[3].setAttribute('disabled', 'disabled');
+      capacity.options[2].removeAttribute('disabled');
+      capacity.options[3].setAttribute('disabled', 'disabled');
+      if (cap === '0') {
+        capacity.setCustomValidity('Выберите количество мест');
+      }
     }
   }
 };
@@ -162,9 +169,7 @@ window.addEventListener('DOMContentLoaded', function () {
   setDisabledElements(fieldsetsAdForm);
   setDisabledElements(fieldsetsMapFilters);
   addressField.value = getPinMainPosition(pinMain, MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT);
-
-  var num = roomNumberSelect.value;
-  getRoomsForGuests(num);
+  getRoomsForGuests(roomNumberSelect, capacitySelect);
 });
 
 var getRandomNumber = function (min, max) {
@@ -311,4 +316,4 @@ for (var j = 0; j < 1; j++) {
   fragment.appendChild(offerItem);
 }
 
-// map.insertBefore(fragment, mapFiltersContainer);
+map.insertBefore(fragment, mapFiltersContainer);
