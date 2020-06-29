@@ -96,16 +96,18 @@ var onPinPressEnter = function (evt) {
   }
 };
 
+var onPinMouseDown = function (evt) {
+  if (evt.button === 0) {
+    initMap(addressField);
+  }
+};
+
 var activateMap = function () {
   map.classList.remove('map--faded');
   adForm.classList.remove('ad-form--disabled');
   unDisabledElements(fieldsetsAdForm);
   unDisabledElements(fieldsetsMapFilters);
-  pinMain.addEventListener('mousedown', function (evt) {
-    if (evt.button === 0) {
-      initMap(addressField);
-    }
-  });
+  pinMain.removeEventListener('mousedown', onPinMouseDown);
   pinMain.removeEventListener('keydown', onPinPressEnter);
 };
 
@@ -114,11 +116,7 @@ var deActivateMap = function () {
   adForm.classList.add('ad-form--disabled');
   setDisabledElements(fieldsetsAdForm);
   setDisabledElements(fieldsetsMapFilters);
-  pinMain.addEventListener('mousedown', function (evt) {
-    if (evt.button === 0) {
-      initMap(addressField);
-    }
-  });
+  pinMain.addEventListener('mousedown', onPinMouseDown);
   pinMain.addEventListener('keydown', onPinPressEnter);
 };
 
@@ -143,7 +141,6 @@ var initMap = function (el) {
   activateMap();
   el.value = getPinMainPosition(pinMain, MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT, MAIN_PIN_ARROW_HEIGHT);
 };
-
 
 adForm.addEventListener('change', function () {
   selectRoomsForGuests(roomNumberSelect, capacitySelect);
@@ -183,12 +180,6 @@ window.addEventListener('DOMContentLoaded', function () {
   setDisabledElements(fieldsetsMapFilters);
   addressField.value = getPinMainPosition(pinMain, MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT);
   selectRoomsForGuests(roomNumberSelect, capacitySelect);
-  pinMain.addEventListener('mousedown', function (evt) {
-    if (evt.button === 0) {
-      initMap(addressField);
-    }
-  });
-  pinMain.addEventListener('keydown', onPinPressEnter);
   deActivateMap();
 });
 
