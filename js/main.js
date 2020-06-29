@@ -102,7 +102,7 @@ var onPinMouseDown = function (evt) {
   }
 };
 
-var activateMap = function () {
+var activatePage = function () {
   map.classList.remove('map--faded');
   adForm.classList.remove('ad-form--disabled');
   unDisabledElements(fieldsetsAdForm);
@@ -111,11 +111,13 @@ var activateMap = function () {
   pinMain.removeEventListener('keydown', onPinPressEnter);
 };
 
-var deActivateMap = function () {
+var deActivatePage = function () {
   map.classList.add('map--faded');
   adForm.classList.add('ad-form--disabled');
   setDisabledElements(fieldsetsAdForm);
   setDisabledElements(fieldsetsMapFilters);
+  addressField.value = getPinMainPosition(pinMain, MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT);
+  selectRoomsForGuests(roomNumberSelect, capacitySelect);
   pinMain.addEventListener('mousedown', onPinMouseDown);
   pinMain.addEventListener('keydown', onPinPressEnter);
 };
@@ -138,7 +140,7 @@ var getPinMainPosition = function (el, width, height, arrowheight) {
 };
 
 var initMap = function (el) {
-  activateMap();
+  activatePage();
   el.value = getPinMainPosition(pinMain, MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT, MAIN_PIN_ARROW_HEIGHT);
 };
 
@@ -176,11 +178,7 @@ var selectRoomsForGuests = function (rooms, capacity) {
 };
 
 window.addEventListener('DOMContentLoaded', function () {
-  setDisabledElements(fieldsetsAdForm);
-  setDisabledElements(fieldsetsMapFilters);
-  addressField.value = getPinMainPosition(pinMain, MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT);
-  selectRoomsForGuests(roomNumberSelect, capacitySelect);
-  deActivateMap();
+  deActivatePage();
 });
 
 var getRandomNumber = function (min, max) {
