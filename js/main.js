@@ -151,7 +151,7 @@ adForm.addEventListener('change', function () {
 
 var selectRoomsForGuests = function (rooms, capacity) {
   var numberRooms = rooms.value;
-  var cap = capacity.value;
+  var numberMembers = capacity.value;
 
   if (numberRooms === '1' || numberRooms === '100') {
     if (numberRooms === '1') {
@@ -165,13 +165,13 @@ var selectRoomsForGuests = function (rooms, capacity) {
     if (numberRooms === '2') {
       capacity.options[2].setAttribute('disabled', 'disabled');
       capacity.options[3].setAttribute('disabled', 'disabled');
-      if (cap === '0') {
+      if (numberMembers === '0') {
         capacity.setCustomValidity('Выберите количество мест');
       }
     } else if (numberRooms === '3') {
       capacity.options[2].removeAttribute('disabled');
       capacity.options[3].setAttribute('disabled', 'disabled');
-      if (cap === '0') {
+      if (numberMembers === '0') {
         capacity.setCustomValidity('Выберите количество мест');
       }
     }
@@ -189,6 +189,7 @@ window.addEventListener('DOMContentLoaded', function () {
     }
   });
   pinMain.addEventListener('keydown', onPinPressEnter);
+  deActivateMap();
 });
 
 var getRandomNumber = function (min, max) {
