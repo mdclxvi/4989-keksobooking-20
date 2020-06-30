@@ -1,11 +1,26 @@
 'use strict';
 
+var MAIN_PIN_WIDTH = 65;
+var MAIN_PIN_HEIGHT = 65;
+var MAIN_PIN_ARROW_HEIGHT = 22;
+
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
 
 var map = document.querySelector('.map');
-map.classList.remove('map--faded');
+var pinMain = map.querySelector('.map__pin--main');
 var mapFiltersContainer = map.querySelector('.map__filters-container');
+
+var adForm = document.querySelector('.ad-form');
+var fieldsetsAdForm = adForm.querySelectorAll('fieldset');
+
+var addressField = adForm.querySelector('#address');
+var roomNumberSelect = adForm.querySelector('#room_number');
+var capacitySelect = adForm.querySelector('#capacity');
+
+var mapFilters = document.querySelector('.map__filters');
+var fieldsetsMapFilters = mapFilters.querySelectorAll('fieldset');
+
 
 var pinContainer = document.querySelector('.map__pins');
 var widthPinContainer = pinContainer.offsetWidth;
@@ -62,6 +77,109 @@ var photos = [
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg',
 ];
+
+var setDisabledElements = function (elements) {
+  for (i = 0; i < elements.length; i++) {
+    elements[i].setAttribute('disabled', 'disabled');
+  }
+};
+
+var unDisabledElements = function (elements) {
+  for (i = 0; i < elements.length; i++) {
+    elements[i].removeAttribute('disabled');
+  }
+};
+
+var onPinPressEnter = function (evt) {
+  if (evt.key === 'Enter') {
+    initMap(addressField);
+  }
+};
+
+var onPinMouseDown = function (evt) {
+  if (evt.button === 0) {
+    initMap(addressField);
+  }
+};
+
+var activatePage = function () {
+  map.classList.remove('map--faded');
+  adForm.classList.remove('ad-form--disabled');
+  unDisabledElements(fieldsetsAdForm);
+  unDisabledElements(fieldsetsMapFilters);
+  pinMain.removeEventListener('mousedown', onPinMouseDown);
+  pinMain.removeEventListener('keydown', onPinPressEnter);
+};
+
+var deActivatePage = function () {
+  map.classList.add('map--faded');
+  adForm.classList.add('ad-form--disabled');
+  setDisabledElements(fieldsetsAdForm);
+  setDisabledElements(fieldsetsMapFilters);
+  addressField.value = getPinMainPosition(pinMain, MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT);
+  selectRoomsForGuests(roomNumberSelect, capacitySelect);
+  pinMain.addEventListener('mousedown', onPinMouseDown);
+  pinMain.addEventListener('keydown', onPinPressEnter);
+};
+
+var getPinMainPosition = function (el, width, height, arrowheight) {
+  var left = parseFloat(el.style.left);
+  var top = parseFloat(el.style.top);
+  var offsetLeft = Math.round(left - width / 2);
+  var offsetTop;
+
+  if (arrowheight) {
+    offsetTop = Math.round(top - (height + arrowheight) / 2);
+  } else {
+    offsetTop = Math.round(top - height / 2);
+  }
+
+  var pinPosition = offsetLeft + ', ' + offsetTop;
+
+  return pinPosition;
+};
+
+var initMap = function (el) {
+  activatePage();
+  el.value = getPinMainPosition(pinMain, MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT, MAIN_PIN_ARROW_HEIGHT);
+};
+
+adForm.addEventListener('change', function () {
+  selectRoomsForGuests(roomNumberSelect, capacitySelect);
+});
+
+var selectRoomsForGuests = function (rooms, capacity) {
+  var numberRooms = rooms.value;
+  var numberMembers = capacity.value;
+
+  if (numberRooms === '1' || numberRooms === '100') {
+    if (numberRooms === '1') {
+      capacity.selectedIndex = 0;
+    } else if (numberRooms === '100') {
+      capacity.selectedIndex = 3;
+    }
+    capacity.setAttribute('disabled', 'disabled');
+  } else {
+    capacity.removeAttribute('disabled');
+    if (numberRooms === '2') {
+      capacity.options[2].setAttribute('disabled', 'disabled');
+      capacity.options[3].setAttribute('disabled', 'disabled');
+      if (numberMembers === '0') {
+        capacity.setCustomValidity('Выберите количество мест');
+      }
+    } else if (numberRooms === '3') {
+      capacity.options[2].removeAttribute('disabled');
+      capacity.options[3].setAttribute('disabled', 'disabled');
+      if (numberMembers === '0') {
+        capacity.setCustomValidity('Выберите количество мест');
+      }
+    }
+  }
+};
+
+window.addEventListener('DOMContentLoaded', function () {
+  deActivatePage();
+});
 
 var getRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
