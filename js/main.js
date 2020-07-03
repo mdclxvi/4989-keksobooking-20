@@ -98,12 +98,17 @@ var onPinPressEnter = function (evt) {
   }
 };
 
+
 var onMainPinMouseDown = function (evt) {
   if (evt.button === 0) {
     initMap(addressField);
   }
 };
 
+
+buttonClose.addEventListener('click', function () {
+  cardTemplate.classList.add('haha');
+});
 
 var activatePage = function () {
   map.classList.remove('map--faded');
@@ -271,6 +276,7 @@ var getCollectOffer = function (template, item) {
     offerPhotosContainer: offerElement.querySelector('.popup__photos'),
     offerPhoto: offerElement.querySelector('.popup__photo'),
     avatar: offerElement.querySelector('.popup__avatar'),
+    buttonClose: offerElement.querySelector('.popup__close'),
   };
 
   dom.title.textContent = item.offer.title;
@@ -315,6 +321,16 @@ var getCollectOffer = function (template, item) {
     dom.offerFeaturesContainer.remove();
   }
 
+  dom.buttonClose.addEventListener('click', function () {
+    offerElement.remove();
+  });
+
+  dom.buttonClose.addEventListener('keydown', function (evt) {
+    if (evt.key === 'Escape') {
+      offerElement.remove();
+    }
+  });
+
   return offerElement;
 };
 
@@ -327,8 +343,10 @@ var renderOffer = function (el, data, template, container) {
   });
 };
 
-var clearOffer = function () {
+var clearOffer = function (items) {
+  for (var i = 0; i < items.length; i++) {
 
+  }
 };
 
 var renderPins = function (items, pinTemplate, pinWidth, pinHeight, template, container) {
