@@ -33,6 +33,8 @@ var cardTemplate = document.querySelector('#card')
     .content
     .querySelector('.map__card');
 
+var buttonClose = cardTemplate.querySelector('.popup__close');
+
 var avatars = [
   'img/avatars/user01.png',
   'img/avatars/user02.png',
@@ -78,14 +80,14 @@ var photos = [
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg',
 ];
 
-var setDisabledElements = function (elements) {
-  for (i = 0; i < elements.length; i++) {
+var disabledElements = function (elements) {
+  for (var i = 0; i < elements.length; i++) {
     elements[i].setAttribute('disabled', 'disabled');
   }
 };
 
-var unDisabledElements = function (elements) {
-  for (i = 0; i < elements.length; i++) {
+var undisabledElements = function (elements) {
+  for (var i = 0; i < elements.length; i++) {
     elements[i].removeAttribute('disabled');
   }
 };
@@ -96,29 +98,30 @@ var onPinPressEnter = function (evt) {
   }
 };
 
-var onPinMouseDown = function (evt) {
+var onMainPinMouseDown = function (evt) {
   if (evt.button === 0) {
     initMap(addressField);
   }
 };
 
+
 var activatePage = function () {
   map.classList.remove('map--faded');
   adForm.classList.remove('ad-form--disabled');
-  unDisabledElements(fieldsetsAdForm);
-  unDisabledElements(fieldsetsMapFilters);
-  pinMain.removeEventListener('mousedown', onPinMouseDown);
+  undisabledElements(fieldsetsAdForm);
+  undisabledElements(fieldsetsMapFilters);
+  pinMain.removeEventListener('mousedown', onMainPinMouseDown);
   pinMain.removeEventListener('keydown', onPinPressEnter);
 };
 
 var deActivatePage = function () {
   map.classList.add('map--faded');
   adForm.classList.add('ad-form--disabled');
-  setDisabledElements(fieldsetsAdForm);
-  setDisabledElements(fieldsetsMapFilters);
+  disabledElements(fieldsetsAdForm);
+  disabledElements(fieldsetsMapFilters);
   addressField.value = getPinMainPosition(pinMain, MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT);
   selectRoomsForGuests(roomNumberSelect, capacitySelect);
-  pinMain.addEventListener('mousedown', onPinMouseDown);
+  pinMain.addEventListener('mousedown', onMainPinMouseDown);
   pinMain.addEventListener('keydown', onPinPressEnter);
 };
 
@@ -179,6 +182,8 @@ var selectRoomsForGuests = function (rooms, capacity) {
 
 window.addEventListener('DOMContentLoaded', function () {
   deActivatePage();
+  renderPins(pinItems, advertTemplate, PIN_WIDTH, PIN_HEIGHT, cardTemplate, mapFiltersContainer);
+
 });
 
 var getRandomNumber = function (min, max) {
@@ -249,13 +254,6 @@ var getCollectPin = function (template, width, height, item) {
 var pinItems = createArrayItems(8, widthPinContainer);
 var fragment = document.createDocumentFragment();
 
-for (var i = 0; i < pinItems.length; i++) {
-  var pinItem = getCollectPin(advertTemplate, PIN_WIDTH, PIN_HEIGHT, pinItems[i]);
-  fragment.appendChild(pinItem);
-}
-
-pinContainer.appendChild(fragment);
-
 var getCollectOffer = function (template, item) {
 
   var offerElement = template.cloneNode(true);
@@ -295,9 +293,9 @@ var getCollectOffer = function (template, item) {
 
   if (item.offer.photos.length > 0) {
     dom.offerPhoto.src = item.offer.photos[0];
-    for (var j = 1; j < item.offer.photos.length; j++) {
+    for (var i = 1; i < item.offer.photos.length; i++) {
       var newOfferPhoto = dom.offerPhoto.cloneNode(true);
-      newOfferPhoto.src = item.offer.photos[j];
+      newOfferPhoto.src = item.offer.photos[i];
       dom.offerPhotosContainer.appendChild(newOfferPhoto);
     }
   } else {
@@ -305,12 +303,12 @@ var getCollectOffer = function (template, item) {
   }
 
   if (item.offer.features.length > 0) {
-    for (var k = 0; k < dom.offerFeatures.length; k++) {
+    for (var j = 0; j < dom.offerFeatures.length; j++) {
       if (!item.offer.features.some(function (elem) {
         var elemClass = featuresList[elem];
-        return dom.offerFeatures[k].classList.contains(elemClass);
+        return dom.offerFeatures[j].classList.contains(elemClass);
       })) {
-        dom.offerFeatures[k].remove();
+        dom.offerFeatures[j].remove();
       }
     }
   } else {
@@ -320,9 +318,30 @@ var getCollectOffer = function (template, item) {
   return offerElement;
 };
 
-for (var j = 0; j < 1; j++) {
-  var offerItem = getCollectOffer(cardTemplate, pinItems[0]);
-  fragment.appendChild(offerItem);
-}
 
-map.insertBefore(fragment, mapFiltersContainer);
+var renderOffer = function (el, data, template, container) {
+  el.addEventListener('click', function () {
+    el = getCollectOffer(template, data);
+    fragment.appendChild(el);
+    map.insertBefore(fragment, container);
+  });
+};
+
+var clearOffer = function () {
+
+};
+
+var renderPins = function (items, pinTemplate, pinWidth, pinHeight, template, container) {
+  for (var i = 0; i < items.length; i++) {
+    var pinItem = getCollectPin(pinTemplate, pinWidth, pinHeight, items[i]);
+    fragment.appendChild(pinItem);
+    renderOffer(pinItem, items[i], template, container);
+  }
+  pinContainer.appendChild(fragment);
+};
+
+
+// var ooops = renderOffers(cardTemplate, pinItems);
+
+// console.log(ooops);
+
