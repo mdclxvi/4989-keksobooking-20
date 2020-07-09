@@ -13,10 +13,15 @@ var mapFiltersContainer = map.querySelector('.map__filters-container');
 
 var adForm = document.querySelector('.ad-form');
 var fieldsetsAdForm = adForm.querySelectorAll('fieldset');
+var inputTitle = adForm.querySelector('#title');
+var inputPrice = adForm.querySelector('#price');
 
 var addressField = adForm.querySelector('#address');
 var roomNumberSelect = adForm.querySelector('#room_number');
 var capacitySelect = adForm.querySelector('#capacity');
+var typeSelect = adForm.querySelector('#type');
+var timeInSelect = adForm.querySelector('#timein');
+var timeOutSelect = adForm.querySelector('#timeout');
 
 var mapFilters = document.querySelector('.map__filters');
 var fieldsetsMapFilters = mapFilters.querySelectorAll('fieldset');
@@ -78,14 +83,14 @@ var photos = [
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg',
 ];
 
-var setDisabledElements = function (elements) {
-  for (i = 0; i < elements.length; i++) {
+var disabledElements = function (elements) {
+  for (var i = 0; i < elements.length; i++) {
     elements[i].setAttribute('disabled', 'disabled');
   }
 };
 
-var unDisabledElements = function (elements) {
-  for (i = 0; i < elements.length; i++) {
+var undisabledElements = function (elements) {
+  for (var i = 0; i < elements.length; i++) {
     elements[i].removeAttribute('disabled');
   }
 };
@@ -96,7 +101,7 @@ var onPinPressEnter = function (evt) {
   }
 };
 
-var onPinMouseDown = function (evt) {
+var onMainPinMouseDown = function (evt) {
   if (evt.button === 0) {
     initMap(addressField);
   }
@@ -105,20 +110,21 @@ var onPinMouseDown = function (evt) {
 var activatePage = function () {
   map.classList.remove('map--faded');
   adForm.classList.remove('ad-form--disabled');
-  unDisabledElements(fieldsetsAdForm);
-  unDisabledElements(fieldsetsMapFilters);
-  pinMain.removeEventListener('mousedown', onPinMouseDown);
+  undisabledElements(fieldsetsAdForm);
+  undisabledElements(fieldsetsMapFilters);
+  pinMain.removeEventListener('mousedown', onMainPinMouseDown);
   pinMain.removeEventListener('keydown', onPinPressEnter);
+  renderPins(pinItems, advertTemplate, PIN_WIDTH, PIN_HEIGHT, cardTemplate, mapFiltersContainer);
 };
 
 var deActivatePage = function () {
   map.classList.add('map--faded');
   adForm.classList.add('ad-form--disabled');
-  setDisabledElements(fieldsetsAdForm);
-  setDisabledElements(fieldsetsMapFilters);
+  disabledElements(fieldsetsAdForm);
+  disabledElements(fieldsetsMapFilters);
   addressField.value = getPinMainPosition(pinMain, MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT);
   selectRoomsForGuests(roomNumberSelect, capacitySelect);
-  pinMain.addEventListener('mousedown', onPinMouseDown);
+  pinMain.addEventListener('mousedown', onMainPinMouseDown);
   pinMain.addEventListener('keydown', onPinPressEnter);
 };
 
@@ -146,6 +152,7 @@ var initMap = function (el) {
 
 adForm.addEventListener('change', function () {
   selectRoomsForGuests(roomNumberSelect, capacitySelect);
+  changeAttrsInputPrice(typeSelect, inputPrice);
 });
 
 var selectRoomsForGuests = function (rooms, capacity) {
@@ -179,6 +186,7 @@ var selectRoomsForGuests = function (rooms, capacity) {
 
 window.addEventListener('DOMContentLoaded', function () {
   deActivatePage();
+  changeAttrsInputPrice(typeSelect, inputPrice);
 });
 
 var getRandomNumber = function (min, max) {
@@ -249,13 +257,6 @@ var getCollectPin = function (template, width, height, item) {
 var pinItems = createArrayItems(8, widthPinContainer);
 var fragment = document.createDocumentFragment();
 
-for (var i = 0; i < pinItems.length; i++) {
-  var pinItem = getCollectPin(advertTemplate, PIN_WIDTH, PIN_HEIGHT, pinItems[i]);
-  fragment.appendChild(pinItem);
-}
-
-pinContainer.appendChild(fragment);
-
 var getCollectOffer = function (template, item) {
 
   var offerElement = template.cloneNode(true);
@@ -273,6 +274,7 @@ var getCollectOffer = function (template, item) {
     offerPhotosContainer: offerElement.querySelector('.popup__photos'),
     offerPhoto: offerElement.querySelector('.popup__photo'),
     avatar: offerElement.querySelector('.popup__avatar'),
+    buttonClose: offerElement.querySelector('.popup__close'),
   };
 
   dom.title.textContent = item.offer.title;
@@ -295,9 +297,9 @@ var getCollectOffer = function (template, item) {
 
   if (item.offer.photos.length > 0) {
     dom.offerPhoto.src = item.offer.photos[0];
-    for (var j = 1; j < item.offer.photos.length; j++) {
+    for (var i = 1; i < item.offer.photos.length; i++) {
       var newOfferPhoto = dom.offerPhoto.cloneNode(true);
-      newOfferPhoto.src = item.offer.photos[j];
+      newOfferPhoto.src = item.offer.photos[i];
       dom.offerPhotosContainer.appendChild(newOfferPhoto);
     }
   } else {
@@ -305,24 +307,117 @@ var getCollectOffer = function (template, item) {
   }
 
   if (item.offer.features.length > 0) {
-    for (var k = 0; k < dom.offerFeatures.length; k++) {
+    for (var j = 0; j < dom.offerFeatures.length; j++) {
       if (!item.offer.features.some(function (elem) {
         var elemClass = featuresList[elem];
-        return dom.offerFeatures[k].classList.contains(elemClass);
+        return dom.offerFeatures[j].classList.contains(elemClass);
       })) {
-        dom.offerFeatures[k].remove();
+        dom.offerFeatures[j].remove();
       }
     }
   } else {
     dom.offerFeaturesContainer.remove();
   }
 
+  dom.buttonClose.addEventListener('click', function () {
+    offerElement.remove();
+  });
+
+  dom.buttonClose.addEventListener('keydown', function (evt) {
+    if (evt.key === 'Escape') {
+      offerElement.remove();
+    }
+  });
+
   return offerElement;
 };
 
-for (var j = 0; j < 1; j++) {
-  var offerItem = getCollectOffer(cardTemplate, pinItems[0]);
-  fragment.appendChild(offerItem);
-}
 
-map.insertBefore(fragment, mapFiltersContainer);
+var renderOffer = function (el, data, template, container) {
+  el.addEventListener('click', function () {
+    el = getCollectOffer(template, data);
+    clearOffers();
+    fragment.appendChild(el);
+    map.insertBefore(fragment, container);
+  });
+};
+
+var clearOffers = function () {
+  var popup = document.querySelectorAll('.popup');
+  for (var i = 0; i < popup.length; i++) {
+    popup[i].remove();
+  }
+};
+
+var renderPins = function (items, pinTemplate, pinWidth, pinHeight, template, container) {
+  for (var i = 0; i < items.length; i++) {
+    var pinItem = getCollectPin(pinTemplate, pinWidth, pinHeight, items[i]);
+    fragment.appendChild(pinItem);
+    renderOffer(pinItem, items[i], template, container);
+  }
+  pinContainer.appendChild(fragment);
+};
+
+inputTitle.addEventListener('invalid', function () {
+  if (inputTitle.validity.tooShort) {
+    inputTitle.setCustomValidity('Заголовок должен состоять минимум из 30 символов');
+  } else if (inputTitle.validity.tooLong) {
+    inputTitle.setCustomValidity('Заголовок не должен превышать 100 символов');
+  } else if (inputTitle.validity.valueMissing) {
+    inputTitle.setCustomValidity('Обязательное поле');
+  } else {
+    inputTitle.setCustomValidity('');
+  }
+});
+
+inputPrice.addEventListener('invalid', function (evt) {
+  var inputPriceMaxValue = evt.target.getAttribute('max');
+  if (inputPrice.validity.valueMissing) {
+    inputPrice.setCustomValidity('Обязательное поле');
+  } else if (inputPrice.validity.rangeOverflow) {
+    inputPrice.setCustomValidity('Стоимость не должна превышать ' + inputPriceMaxValue + ' рублей');
+  } else {
+    inputPrice.setCustomValidity('');
+  }
+});
+
+var changeAttrsInputPrice = function (type, price) {
+  var typeSelectValue = type.value;
+
+  if (typeSelectValue === 'bungalo') {
+    price.placeholder = '0';
+    price.setAttribute('min', 0);
+  } else if (typeSelectValue === 'flat') {
+    price.placeholder = '1 000';
+    price.setAttribute('min', 1000);
+  } else if (typeSelectValue === 'house') {
+    price.placeholder = '5 000';
+    price.setAttribute('min', 5000);
+  } else if (typeSelectValue === 'palace') {
+    price.placeholder = '10 000';
+    price.setAttribute('min', 10000);
+  }
+};
+
+var selectsTime = [timeInSelect, timeOutSelect];
+
+timeInSelect.addEventListener('change', function () {
+  syncSelectsTime(selectsTime, 0);
+});
+
+timeOutSelect.addEventListener('change', function () {
+  syncSelectsTime(selectsTime, 1);
+});
+
+var syncSelectsTime = function (selects, mainSelectIndex) {
+  var mainSelect;
+  if (!mainSelectIndex) {
+    mainSelect = selects[0];
+  }
+  mainSelect = selects[mainSelectIndex];
+  var mainValue = mainSelect.value;
+  selects.forEach(function (select) {
+    select.value = mainValue;
+  });
+};
+
